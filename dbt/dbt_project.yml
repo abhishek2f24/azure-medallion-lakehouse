@@ -1,0 +1,42 @@
+name: 'supply_lakehouse'
+version: '1.0.0'
+config-version: 2
+
+profile: 'supply_lakehouse'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  supply_lakehouse:
+    staging:
+      +schema: silver
+      +tags: ["staging"]
+      +materialized: incremental
+    intermediate:
+      +schema: silver
+      +tags: ["intermediate"]
+      +materialized: incremental
+    marts:
+      +schema: gold
+      +tags: ["marts"]
+      +materialized: incremental
+      fct_supply_chain:
+        +materialized: incremental
+      dim_supplier_scorecard:
+        +materialized: table
+
+packages:
+  - package: dbt-labs/dbt_utils
+    version: [">=1.1.0", "<2.0.0"]
+  - package: dbt-labs/audit_helper
+    version: [">=0.9.0", "<1.0.0"]
+
+vars:
+  sla_threshold_days: 7
+  high_value_order_usd: 10000
+  supplier_review_window_days: 90
